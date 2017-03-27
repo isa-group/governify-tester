@@ -25,7 +25,6 @@ var Promise = require('bluebird');
 var config = require('./configurations/config.js');
 var fs = require('fs');
 var jsyaml = require('js-yaml');
-//var cluster = require('cluster');
 var moment = require('moment');
 
 
@@ -61,7 +60,7 @@ var doRequest = function(options) {
 
 
 function _promisesRequests(url, method, number, body, headers) {
-    var options;
+    let options;
 
     if (method.toUpperCase() == "GET") {
         options = {
@@ -74,7 +73,7 @@ function _promisesRequests(url, method, number, body, headers) {
                 body = JSON.parse(body);
             }
         }
-        var isJson = true;
+        let isJson = true;
         if (headers && headers['content-type'] != "application/json") {
             isJson = false;
         }
@@ -100,13 +99,13 @@ function _promisesRequests(url, method, number, body, headers) {
 }
 
 
-function _doRequests(url, method, count, body) {
+function _doRequests(url, method, count, body, headers) {
     setInterval(function() {
         let total = 0;
         let successful = 0;
         let error = 0;
         let start_date = moment();
-        _promisesRequests(url, method, count, body).then(function(success) {
+        _promisesRequests(url, method, count, body, headers).then(function(success) {
             success.forEach(function(element) {
                 if (element) {
                     successful++;
@@ -133,6 +132,82 @@ function _doRequests(url, method, count, body) {
 
     }, 1000); // setInterv0al
 
+}
+
+
+function _doRequestsRandom(url, method, count, duration, body, headers) {
+    return new Promise(function(resolve) {
+
+        let total = 0;
+        let successful = 0;
+        let error = 0;
+        let request_ack = 0;
+        let counter_timer = 0;
+        let start_date = moment();
+        let interval = setInterval(function() {
+            let bodygenerated = undefined
+            if (body) {
+                bodygenerated = generateRandomObject(body);
+                console.log(bodygenerated);
+            };
+
+            if (counter_timer == duration - 1) {
+                clearInterval(interval);
+            }
+
+            _promisesRequests(url, method, count, bodygenerated, headers).then(function(success) {
+                success.forEach(function(element) {
+                    if (element) {
+                        successful++;
+                    } else {
+                        error++;
+                    }
+
+                    total++;
+
+                });
+
+                request_ack++;
+                if (request_ack == duration) {
+                    let finish_date = moment();
+                    let resobject = {};
+                    resobject.totalRequest = total;
+                    resobject.success = successful;
+                    resobject.error = error;
+                    resobject.totalStack = request_ack;
+                    resobject.startTime = start_date.toISOString();
+                    resobject.finishTime = finish_date.toISOString();
+                    resobject.lastedFor = finish_date - start_date + " ms";
+                    resolve(resobject);
+                }
+
+            });
+            counter_timer++;
+
+
+        }, 1000); // setInterval
+
+    });
+
+
+
+
+
+}
+
+function generateRandomObject(body) {
+    let obj_rand = {};
+
+    for (var key in body) {
+        let objects = body[key]
+        if (!objects.indexOf("Date")) {
+            obj_rand[key] = moment().toISOString();
+        } else {
+            obj_rand[key] = objects[Math.floor(Math.random() * (objects.length - 1))];
+
+        }
+    }
+    return obj_rand;
 }
 
 
@@ -259,7 +334,7 @@ function _doParallelRequestFromfile(uri) {
         var arrayResults = [];
         for (var i = 0; i < configs; i++) {
             let singleDoc = newConfigurations[i];
-            _doc(singleDoc).then(function(success) {
+            _switchdoc(singleDoc).then(function(success) {
                 executed++;
                 arrayResults.push(success);
                 if (executed == configs) {
@@ -267,7 +342,6 @@ function _doParallelRequestFromfile(uri) {
                 }
 
             });
-            //cluster.fork();
         }
 
 
@@ -283,7 +357,7 @@ function _doParallelRequestFromfile(uri) {
 
 
 
-function _doc(testConfiguration) {
+function _switchdoc(testConfiguration) {
     return new Promise(function(resolve) {
         var type = testConfiguration.type;
 
@@ -317,6 +391,20 @@ function _doc(testConfiguration) {
 
             }
 
+        } else if (type == "random") {
+
+
+
+            _doRequestsRandom(testConfiguration.url, testConfiguration.request.method, testConfiguration.count,
+                testConfiguration.duration, testConfiguration.request.body, testConfiguration.headers).then(function(success) {
+                success.url = testConfiguration.url;
+                success.method = testConfiguration.request.method;
+                success.idTest = testConfiguration.testId;
+                console.log(success);
+                writeLog(success);
+                resolve(success);
+
+            });
         } else {
 
             execRequests(testConfiguration).then(function(success) {
