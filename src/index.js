@@ -1,8 +1,8 @@
 /*!
-parallel-requests 2.2.0, built on: 2017-03-21
-Copyright (C) 2017 Jose Enrique Ruiz Navarro
+governify-tester 0.0.1, built on: 2017-03-28
+Copyright (C) 2017 ISA Group
 http://www.isa.us.es/
-https://github.com/joseEnrique/parallel-requests
+https://github.com/isa-group/governify-tester
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -135,7 +135,7 @@ function _doRequests(url, method, count, body, headers) {
 }
 
 
-function _doRequestsRandom(url, method, count, duration, body, headers) {
+function _doRequestsRandom(url, method, count, duration, body, headers, fields) {
     return new Promise(function(resolve) {
 
         let total = 0;
@@ -145,11 +145,23 @@ function _doRequestsRandom(url, method, count, duration, body, headers) {
         let counter_timer = 0;
         let start_date = moment();
         let interval = setInterval(function() {
-            let bodygenerated = undefined
-            if (body) {
-                bodygenerated = generateRandomObject(body);
-                console.log(bodygenerated);
-            };
+            let bodygenerated;
+
+            if (fields) {
+                if (body) {
+                    bodygenerated = generateRandomObjectTemplate(body, fields);
+                    console.log(bodygenerated);
+                } else {
+                    throw new Error("Body's necessary for rendering");
+                }
+
+            } else {
+                if (body) {
+                    bodygenerated = generateRandomObject(body);
+                    console.log(bodygenerated);
+                }
+            }
+
 
             if (counter_timer == duration - 1) {
                 clearInterval(interval);
@@ -199,7 +211,7 @@ function generateRandomObject(body) {
     let obj_rand = {};
 
     for (var key in body) {
-        let objects = body[key]
+        let objects = body[key];
         if (!objects.indexOf("Date")) {
             obj_rand[key] = moment().toISOString();
         } else {
@@ -209,6 +221,30 @@ function generateRandomObject(body) {
     }
     return obj_rand;
 }
+
+
+function generateRandomObjectTemplate(body, fields) {
+    for (var key in fields) {
+        let objects = fields[key];
+        let charReplaced = '"{{' + key + '}}"';
+        var re = new RegExp(charReplaced, "g");
+        if (!objects.indexOf("Date")) {
+            body = body.replace(re, '"' + moment().toISOString() + '"');
+        } else {
+            body = body.replace(re, '"' + objects[Math.floor(Math.random() * (objects.length - 1))] + '"');
+
+        }
+    }
+
+    try {
+        body = JSON.parse(body);
+    } catch (e) {
+        throw new Error("Render has not finished, please you should sure");
+    }
+    return body;
+}
+
+
 
 
 function _doOneStackOfRequest(url, method, count, body) {
@@ -396,7 +432,7 @@ function _switchdoc(testConfiguration) {
 
 
             _doRequestsRandom(testConfiguration.url, testConfiguration.request.method, testConfiguration.count,
-                testConfiguration.duration, testConfiguration.request.body, testConfiguration.headers).then(function(success) {
+                testConfiguration.duration, testConfiguration.request.body, testConfiguration.headers, undefined).then(function(success) {
                 success.url = testConfiguration.url;
                 success.method = testConfiguration.request.method;
                 success.idTest = testConfiguration.testId;
@@ -405,6 +441,22 @@ function _switchdoc(testConfiguration) {
                 resolve(success);
 
             });
+        } else if (type == "randomTemplate") {
+
+            _doRequestsRandom(testConfiguration.url, testConfiguration.request.method, testConfiguration.count,
+                testConfiguration.duration, testConfiguration.request.body, testConfiguration.request.headers, testConfiguration.request.randomFields).then(function(success) {
+                success.url = testConfiguration.url;
+                success.method = testConfiguration.request.method;
+                success.idTest = testConfiguration.testId;
+                console.log(success);
+                writeLog(success);
+                resolve(success);
+
+            });
+
+
+
+
         } else {
 
             execRequests(testConfiguration).then(function(success) {

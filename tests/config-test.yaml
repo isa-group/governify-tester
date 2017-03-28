@@ -47,7 +47,7 @@ testId: validation16
 type: long
 url : https://google.es
 duration: 10 #seconds
-count: 10
+count: 3
 method: GET
 ---
 testId: validation17
@@ -60,8 +60,8 @@ request:
 tenants:
   - id: t1
     intervals: #count
-      - 8
-      - 5
+      - 2
+      - 2
       - 7
     duration: 2 #ms
   - id: t2
@@ -81,3 +81,60 @@ tenants:
       - 0
       - 8
     duration: 2
+---
+testId: validation11
+type: randomTemplate
+url : https://jsonplaceholder.typicode.com/posts
+duration: 2 #seconds
+count: 2
+request:
+  method: POST
+  randomFields:
+    id:
+      - prueba
+      - prueba1
+      - prueba2
+      - prueba3
+      - prueba4
+    value:
+      - value
+      - value1
+      - value2
+      - value3
+      - value4
+    date:
+      - Date #currently date
+  headers:
+    content-type: application/json
+    #randomize in body
+  body: >
+          {
+          "id": "{{id}}",
+          "value": "{{value}}",
+          "date": "{{date}}"
+          }
+---
+testId: validation12
+type: random
+url : https://jsonplaceholder.typicode.com/posts
+duration: 2 #seconds
+count: 2
+request:
+  method: POST
+  headers:
+    content-type: application/json
+  body: #randomize in body
+    id:
+      - prueba
+      - prueba1
+      - prueba2
+      - prueba3
+      - prueba4
+    value:
+      - value
+      - value1
+      - value2
+      - value3
+      - value4
+    date:
+      - Date #currently date

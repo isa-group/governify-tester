@@ -1,8 +1,8 @@
 /*!
-parallel-requests 2.2.0, built on: 2017-03-21
-Copyright (C) 2017 Jose Enrique Ruiz Navarro
+governify-tester 0.0.1, built on: 2017-03-28
+Copyright (C) 2017 ISA Group
 http://www.isa.us.es/
-https://github.com/joseEnrique/parallel-requests
+https://github.com/isa-group/governify-tester
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -70,12 +70,12 @@ describe('GET only ONE successful', function() {
 
 
 
-describe('By config file, 3 test successful', function() {
+describe('By config file, 6 test successful', function() {
     this.timeout(24000);
     it('Execute', (done) => {
         lib.doParallelRequestFromfile('./tests/config-test.yaml').then(function(success) {
             console.log(success);
-            expect(success.length).to.be.equal(4);
+            expect(success.length).to.be.equal(6);
             done();
 
         });
