@@ -199,9 +199,9 @@ request:
 
 ## Latest release
 
-The version 0.0.1 is the latest stable version of governify-tester component.
-see [release note](https://github.com/isa-group/governify-tester/releases/tag/0.0.1) for details.
+The version 0.0.2 is the latest stable version of governify-tester component.
+see [release note](https://github.com/isa-group/governify-tester/releases/tag/0.0.2) for details.
 
 For running:
 
-- Download latest version from [0.0.1](https://github.com/isa-group/governify-tester/releases/tag/0.0.1)
+- Download latest version from [0.0.2](https://github.com/isa-group/governify-tester/releases/tag/0.0.2)
