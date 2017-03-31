@@ -1,5 +1,7 @@
 ![alt build:passed](https://travis-ci.org/isa-group/governify-tester.svg?branch=master)
 
+[![NPM](https://nodei.co/npm/governify-tester.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/governify-tester/)
+
 ## 1. Install the package
 ```bash
 npm install governify-tester --save
