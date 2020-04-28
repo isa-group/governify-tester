@@ -197,11 +197,6 @@ request:
 ```
 
 
-
-# Governify Cli
-
-Cli is a component of the governify ecosystem
-
 ## Copyright notice
 
 **governify-cli** is an Open-source software available under the GNU General Public License (GPL) version 2 (GPL v2) 
