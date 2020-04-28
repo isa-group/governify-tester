@@ -204,8 +204,10 @@ for non-profit applications; for commercial licensing terms, please [contact](./
 
 All including documentation and code are copyrighted and the copyright is owned by [ISA Group](http://www.isa.us.es), 
 [University of Sevilla](http://www.us.es), unauthorized reproduction or distribution of this copyrighted work is illegal.
+For commercial licensing terms, please [contact](https://github.com/isa-group/governify/blob/master/extra/contact.md) for any inquiry.
 
-For technical inquiry please contact to [engineering team](./extra/about.md).
+For technical inquiry please contact to [engineering team](https://github.com/isa-group/governify/blob/master/extra/about.md).
+
 
 ## Latest release
 
